@@ -1,35 +1,43 @@
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Api.Interfaces;
+using Api.Models;
 
 namespace Api.Functions
 {
-    public static class Language
+    public class Language
     {
-        [FunctionName("Language")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+        private readonly ITranslatorService _translatorService; 
+
+        public Language(ITranslatorService translatorService)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            _translatorService = translatorService; 
+        }
 
-            string name = req.Query["name"];
-
+        [FunctionName("Translate")]
+        public async Task<IActionResult> Translate(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "translate")] HttpRequest req)
+        {
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            var data = JsonConvert.DeserializeObject<TranslateRequest>(requestBody);
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
+            var response = await _translatorService.Translate(data.Text, data.To); 
 
-            return new OkObjectResult(responseMessage);
+            return new OkObjectResult(response);
+        }
+
+        [FunctionName("GetSupportLangs")]
+        public async Task<IActionResult> GetSupportLangs(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "languages")] HttpRequest req)
+        {
+            var response = await _translatorService.GetSupportedLanguages();
+
+            return new OkObjectResult(response);
         }
     }
 }
