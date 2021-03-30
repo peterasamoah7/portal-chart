@@ -3,6 +3,14 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "AzureSignalRConnectionString": ""
+    "AzureSignalRConnectionString": "",
+    "AzureTranslator": "",
+    "TranslatorSubKey": "",
+    "ResourceLocation": ""
+  },
+  "Host": {
+    "LocalHttpPort": 7071,
+    "CORS": "http://localhost:4200/",
+    "CORSCredentials": true
   }
 }
