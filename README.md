@@ -105,7 +105,7 @@ To run the application locally, please follow the steps below.
 func start
 ```
 
-### Running from Visual Studio Code
+### Running from Visual Studio
 
 1. From Visual Studio, press `F5`
 
